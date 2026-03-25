@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.henry.offline_first"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.henry.offline_first"
@@ -21,11 +21,17 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            isDebuggable = true
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
         }
     }
     compileOptions {
@@ -36,7 +42,24 @@ android {
         jvmTarget = "1.8"
     }
     buildFeatures {
+        buildConfig = true
         viewBinding = true
+    }
+    flavorDimensions += "environment"
+
+    productFlavors {
+        create("develop") {
+            dimension = "environment"
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+            buildConfigField("Boolean", "ENABLE_LOGS", "true")
+            buildConfigField("String", "BASE_URL", "\"https://newsapi.org/v2/\"")
+        }
+        create("production") {
+            dimension = "environment"
+            buildConfigField("Boolean", "ENABLE_LOGS", "false")
+            buildConfigField("String", "BASE_URL", "\"https://newsapi.org/v2/\"")
+        }
     }
 }
 
