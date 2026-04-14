@@ -1,4 +1,4 @@
-package com.henry.core.network.interceptor
+package com.henry.core.network.di
 
 import android.util.Log
 import com.henry.core.BuildConfig

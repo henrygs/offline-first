@@ -1,4 +1,4 @@
-package com.henry.core.network.interceptor
+package com.henry.core.network.di
 
 import com.henry.core.BuildConfig
 import okhttp3.Interceptor

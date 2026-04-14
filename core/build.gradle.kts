@@ -52,6 +52,10 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
 
+    //Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+
     // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
