@@ -1,14 +1,23 @@
 package com.henry.offline_first
 
 import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import com.henry.offline_first.ui.screens.NewsFeedScreen
+import com.henry.offline_first.ui.theme.OfflineFirstTheme
+import dagger.hilt.android.AndroidEntryPoint
 
-class MainActivity : AppCompatActivity() {
+@AndroidEntryPoint
+class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-   }
+        enableEdgeToEdge()
+        setContent {
+            OfflineFirstTheme {
+                NewsFeedScreen()
+            }
+        }
+    }
 }
