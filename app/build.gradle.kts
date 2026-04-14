@@ -3,11 +3,12 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
     namespace = "com.henry.offline_first"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.henry.offline_first"
@@ -21,11 +22,17 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            isDebuggable = true
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
         }
     }
     compileOptions {
@@ -36,17 +43,53 @@ android {
         jvmTarget = "1.8"
     }
     buildFeatures {
-        viewBinding = true
+        buildConfig = true
+        compose = true
+    }
+    flavorDimensions += "environment"
+
+    productFlavors {
+        create("develop") {
+            dimension = "environment"
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+            buildConfigField("Boolean", "ENABLE_LOGS", "true")
+            buildConfigField("String", "BASE_URL", "\"https://newsapi.org/v2/\"")
+        }
+        create("production") {
+            dimension = "environment"
+            buildConfigField("Boolean", "ENABLE_LOGS", "false")
+            buildConfigField("String", "BASE_URL", "\"https://newsapi.org/v2/\"")
+        }
     }
 }
 
 dependencies {
 
+    implementation(project(":core"))
+    implementation(project(":data"))
+    implementation(project(":domain"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
+
+    // Compose
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.graphics)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.foundation)
+    implementation(libs.activity.compose)
+    implementation(libs.lifecycle.runtime.compose)
+    implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.hilt.navigation.compose)
+    debugImplementation(libs.compose.ui.tooling)
+
+    // Coil
+    implementation(libs.coil.compose)
 
     // Retrofit + OkHttp
     implementation(libs.retrofit)
