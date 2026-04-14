@@ -9,7 +9,7 @@ class NewsRepositoryImpl @Inject constructor(
     private val newsApiService: NewsApiService
 ) : NewsRepository {
 
-    override suspend fun getTopHeadlines(country: String): List<Article> {
+    override fun getTopHeadlines(country: String): List<Article> {
         return newsApiService.getTopHeadlines(country).articles.map { it.toDomain() }
     }
 }
