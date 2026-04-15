@@ -27,6 +27,9 @@ dependencies {
     // Coroutines
     implementation(libs.coroutines.core)
 
+    // Paging
+    implementation(libs.paging.common)
+
     // javax.inject (for @Inject without Android dependency)
     implementation(libs.javax.inject)
 

@@ -2,6 +2,7 @@ package com.henry.offline_first.ui.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,6 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.henry.offline_first.ui.components.NewsCard
 import com.henry.offline_first.viewmodel.NewsUiState
 import com.henry.offline_first.viewmodel.NewsViewModel
@@ -26,7 +29,7 @@ import com.henry.offline_first.viewmodel.NewsViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewsFeedScreen(viewModel: NewsViewModel = hiltViewModel()) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val articles = viewModel.uiState.collectAsLazyPagingItems()
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -45,8 +48,8 @@ fun NewsFeedScreen(viewModel: NewsViewModel = hiltViewModel()) {
             )
         }
     ) { padding ->
-        when (val state = uiState) {
-            is NewsUiState.Loading -> {
+        when (articles.loadState.refresh) {
+            is LoadState.Loading -> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -57,19 +60,9 @@ fun NewsFeedScreen(viewModel: NewsViewModel = hiltViewModel()) {
                 }
             }
 
-            is NewsUiState.Success -> {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                ) {
-                    items(state.articles, key = { it.url ?: it.hashCode().toString() }) { article ->
-                        NewsCard(article = article)
-                    }
-                }
-            }
+            is LoadState.Error -> {
+                val error = (articles.loadState.refresh as LoadState.Error).error
 
-            is NewsUiState.Error -> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -78,10 +71,27 @@ fun NewsFeedScreen(viewModel: NewsViewModel = hiltViewModel()) {
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = state.message,
+                        text = error.message ?: "An error occurred",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.error
                     )
+                }
+            } else -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                ) {
+                    items(articles.itemCount) { index ->
+                        articles[index]?.let { article ->
+                            NewsCard(article = article)
+                        }
+                    }
+                    item {
+                        if (articles.loadState.append is LoadState.Loading) {
+                            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                        }
+                    }
                 }
             }
         }
