@@ -31,7 +31,7 @@ fun formatTimeAgo(publishedAt: String?): String {
         hours < 24 -> "${hours}h"
         days < 7 -> "${days}d"
         else -> {
-            val displayFormat = SimpleDateFormat("MMM d", Locale.US)
+            val displayFormat = SimpleDateFormat("MMM d", Locale("pt", "BR"))
             displayFormat.format(date)
         }
     }
