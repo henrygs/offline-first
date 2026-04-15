@@ -41,6 +41,10 @@ coroutines = "1.9.0"
 # WorkManager
 workmanager = "2.9.1"
 
+# Testing
+mockk = "1.13.13"
+turbine = "1.2.0"
+
 # javax.inject
 javaxInject = "1"
 
@@ -104,6 +108,11 @@ coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutin
 
 # WorkManager
 workmanager = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workmanager" }
+
+# Testing
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 
 # javax.inject (for pure Kotlin modules)
 javax-inject = { group = "javax.inject", name = "javax.inject", version.ref = "javaxInject" }

@@ -28,3 +28,4 @@ include(":core")
 include(":feature")
 
 
+include(":data:test")

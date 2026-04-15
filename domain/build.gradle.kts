@@ -21,4 +21,10 @@ dependencies {
 
     // javax.inject (for @Inject without Android dependency)
     implementation(libs.javax.inject)
+
+    // Testing
+    testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.turbine)
 }
