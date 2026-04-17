@@ -69,31 +69,19 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":data"))
     implementation(project(":domain"))
+    implementation(project(":feature"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
 
-    // Compose
+    // Compose (apenas o necessário para MainActivity/setContent)
     implementation(platform(libs.compose.bom))
-    implementation(libs.compose.ui)
-    implementation(libs.compose.ui.graphics)
-    implementation(libs.compose.ui.tooling.preview)
-    implementation(libs.compose.material3)
-    implementation(libs.compose.foundation)
     implementation(libs.activity.compose)
-    implementation(libs.lifecycle.runtime.compose)
-    implementation(libs.lifecycle.viewmodel.compose)
-    implementation(libs.hilt.navigation.compose)
-    debugImplementation(libs.compose.ui.tooling)
 
-    // Paging
+    // Paging (usado pelo RemoteMediator)
     implementation(libs.paging.runtime)
-    implementation(libs.paging.compose)
-
-    // Coil
-    implementation(libs.coil.compose)
 
     // Retrofit + OkHttp
     implementation(libs.retrofit)
@@ -104,20 +92,12 @@ dependencies {
     // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
+    implementation(libs.room.paging)
     ksp(libs.room.compiler)
-
-    // Navigation
-    implementation(libs.navigation.fragment.ktx)
-    implementation(libs.navigation.ui.ktx)
 
     // Dagger Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
-
-    // Lifecycle (ViewModel + LiveData)
-    implementation(libs.lifecycle.viewmodel.ktx)
-    implementation(libs.lifecycle.livedata.ktx)
-    implementation(libs.lifecycle.runtime.ktx)
 
     // Coroutines
     implementation(libs.coroutines.core)
@@ -128,9 +108,6 @@ dependencies {
 
     // Tests
     testImplementation(libs.junit)
-    testImplementation(libs.mockk)
-    testImplementation(libs.coroutines.test)
-    testImplementation(libs.turbine)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

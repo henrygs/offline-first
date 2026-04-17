@@ -26,6 +26,3 @@ include(":domain")
 include(":data")
 include(":core")
 include(":feature")
-
-
-include(":data:test")

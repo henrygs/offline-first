@@ -4,8 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.henry.offline_first.ui.screens.NewsFeedScreen
-import com.henry.offline_first.ui.theme.OfflineFirstTheme
+import com.henry.representation.home.HomeScreen
+import com.henry.representation.ui.theme.OfflineFirstTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -16,7 +16,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             OfflineFirstTheme {
-                NewsFeedScreen()
+                HomeScreen()
             }
         }
     }
