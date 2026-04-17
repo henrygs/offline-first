@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.room.Room
 import com.henry.core.database.NewsDatabase
 import com.henry.core.database.dao.ArticleDao
-import com.henry.core.database.dao.RemoteKeyDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,7 +27,4 @@ object DatabaseModule {
 
     @Provides
     fun provideArticleDao(database: NewsDatabase): ArticleDao = database.articleDao()
-
-    @Provides
-    fun provideRemoteKeyDao(database: NewsDatabase): RemoteKeyDao = database.remoteKeyDao()
 }

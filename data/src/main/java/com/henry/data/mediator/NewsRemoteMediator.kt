@@ -7,7 +7,6 @@ import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.henry.core.database.NewsDatabase
 import com.henry.core.database.entity.ArticleEntity
-import com.henry.core.database.entity.RemoteKeyEntity
 import com.henry.data.mapper.toEntity
 import com.henry.data.remote.api.NewsApiService
 
@@ -19,11 +18,9 @@ class NewsRemoteMediator(
 ) : RemoteMediator<Int, ArticleEntity>() {
 
     private val articleDao = database.articleDao()
-    private val remoteKeyDao = database.remoteKeyDao()
 
     override suspend fun initialize(): InitializeAction {
-        val count = articleDao.countArticles()
-        return if(count > 0) {
+        return if (articleDao.countArticles() > 0) {
             InitializeAction.SKIP_INITIAL_REFRESH
         } else {
             InitializeAction.LAUNCH_INITIAL_REFRESH
@@ -34,48 +31,51 @@ class NewsRemoteMediator(
         loadType: LoadType,
         state: PagingState<Int, ArticleEntity>
     ): MediatorResult {
-        val page = when(loadType) {
+        val page = calculatePage(loadType, state.config.pageSize)
+            ?: return MediatorResult.Success(endOfPaginationReached = true)
+
+        return try {
+            fetchAndSave(page, state.config.pageSize, loadType)
+        } catch (e: Exception) {
+            handleError(e, loadType)
+        }
+    }
+
+    private suspend fun calculatePage(loadType: LoadType, pageSize: Int): Int? {
+        return when (loadType) {
             LoadType.REFRESH -> 1
-            LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
+            LoadType.PREPEND -> null
             LoadType.APPEND -> {
-                val lastItem = state.lastItemOrNull()
-                    ?: return MediatorResult.Success(endOfPaginationReached = false)
-                val remoteKey = remoteKeyDao.getRemoteKeyByArticleId(lastItem.id)
-                remoteKey?.nextKey ?: return MediatorResult.Success(endOfPaginationReached = true)
+                val count = articleDao.countArticles()
+                if (count == 0) null else (count / pageSize) + 1
             }
         }
-        return try {
-            val response = newsApiService.getTopHeadlines(
-                country = country,
-                page = page,
-                pageSize = state.config.pageSize
-            )
+    }
 
-            val articles = response.articles.map { it.toEntity() }
+    private suspend fun fetchAndSave(page: Int, pageSize: Int, loadType: LoadType): MediatorResult {
+        val response = newsApiService.getTopHeadlines(
+            country = country,
+            page = page,
+            pageSize = pageSize
+        )
 
-            database.withTransaction {
-                if(loadType == LoadType.REFRESH) {
-                    articleDao.clearArticles()
-                    remoteKeyDao.clearAll()
-                }
-                val ids = articleDao.insertAll(articles)
+        val articles = response.articles.map { it.toEntity() }
 
-                val keys = ids.map { id ->
-                    RemoteKeyEntity(
-                        articleId = id.toInt(),
-                        prevKey = if (page == 1) null else page - 1,
-                        nextKey = if (articles.isEmpty()) null else page + 1
-                    )
-                }
-                remoteKeyDao.insertAll(keys)
+        database.withTransaction {
+            if (loadType == LoadType.REFRESH) {
+                articleDao.clearArticles()
             }
-            MediatorResult.Success(endOfPaginationReached = articles.isEmpty())
-        } catch (e: Exception) {
-            if (loadType == LoadType.REFRESH && articleDao.countArticles() > 0) {
-                MediatorResult.Success(endOfPaginationReached = false)
-            } else {
-                MediatorResult.Error(e)
-            }
+            articleDao.insertAll(articles)
+        }
+
+        return MediatorResult.Success(endOfPaginationReached = articles.isEmpty())
+    }
+
+    private suspend fun handleError(e: Exception, loadType: LoadType): MediatorResult {
+        return if (loadType == LoadType.REFRESH && articleDao.countArticles() > 0) {
+            MediatorResult.Success(endOfPaginationReached = false)
+        } else {
+            MediatorResult.Error(e)
         }
     }
 }
